@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<style>
+    span {
+        font-size: 13px !important;
+    }
+</style>
+<body style="width:350px;font-size: 12px;padding:5px">
+    <div class="container" id="app">
+        <p v-for="(feature, index) in features" :key="index">
+            <label>
+              <input v-model="feature.status" @change="handleStatus(feature)" type="checkbox" class="" checked="checked" />
+              <span>{{ feature.text }}</span>
+            </label>
+        </p>
+    </div>
+</body>
+<script src="assets/js/vue.min.js"></script>
+<script src="core/handle.js"></script>
+</html>
