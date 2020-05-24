@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,17 +12,36 @@
         font-size: 13px !important;
     }
 </style>
+
 <body style="width:350px;font-size: 12px;padding:5px">
-    <div class="container" id="app">
+    <div class="container row" id="app">
+        <div class="col s12">
+            <ul class="tabs">
+                <li v-for="(tab, index) in tabs" :key="index" class="tab col s3"><a>{{ tab.title }}</a></li>
+            </ul>
+        </div>
+        <div v-if="tab == 'feature'" class="col s12">
+            <p v-for="(feature, index) in features" :key="index">
+                <label>
+                    <input v-model="feature.status" @change="handleStatus(feature)" type="checkbox" class=""
+                        checked="checked" />
+                    <span>{{ feature.text }}</span>
+                </label>
+            </p>
+        </div>
+    </div>
+    <!-- <div class="container" id="app">
         <p v-for="(feature, index) in features" :key="index">
             <label>
-              <input v-model="feature.status" @change="handleStatus(feature)" type="checkbox" class="" checked="checked" />
-              <span>{{ feature.text }}</span>
+                <input v-model="feature.status" @change="handleStatus(feature)" type="checkbox" class=""
+                    checked="checked" />
+                <span>{{ feature.text }}</span>
             </label>
         </p>
         <p style="margin-top:20px;color: #ccc"><span>Developed by Sven</span></p>
-    </div>
+    </div> -->
 </body>
 <script src="assets/js/vue.min.js"></script>
 <script src="core/handle.js"></script>
+
 </html>

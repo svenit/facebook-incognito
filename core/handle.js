@@ -1,6 +1,16 @@
 let vm = new Vue({
     el: '#app',
     data: {
+        tabs: [
+            {
+                title: 'Chức năng',
+                active: true
+            },
+            {
+                title: 'Bay Màu',
+                active: false
+            }
+        ],
         features:
         {
             blockSeenChat: {
