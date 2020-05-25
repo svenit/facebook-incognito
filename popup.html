@@ -15,21 +15,21 @@
     }
 </style>
 
-<body style="width:500px;font-size: 14px;padding:10px">
-    <div class="container" id="app">
-        <nav>
+<body style="width:500px;font-size: 14px;">
+    <div class="" id="app">
+        <nav class="sticky-top bg-light">
             <div class="nav nav-tabs" id="nav-tab" role="tablist">
                 <a v-for="(tab, index) in tabs" @click="currentTab = index" :class="`nav-item nav-link ${currentTab == index ? 'active' : ''}`" id="nav-home-tab" data-toggle="tab" :href="`#nav-${index}`" role="tab"
                     aria-controls="nav-home" aria-selected="true">{{ tab.title }}</a>
             </div>
         </nav>
-        <div :class="`alert alert-${alert.status} mt-3`" v-if="alert.show">
+        <div :class="`alert alert-${alert.status} m-3`" v-if="alert.show">
             {{ alert.message }}
         </div>
-        <div v-if="loading" class="my-3">
+        <div v-if="loading" class="m-3">
             Đang tải dữ liệu, xin chờ trong giây lát...
         </div>
-        <div v-else class="tab-content mb-3" id="nav-tabContent">
+        <div v-else class="tab-content m-3" id="nav-tabContent">
             <div class="tab-pane active show mt-3" v-if="currentTab == 0" id="nav-0" role="tabpanel"
                 aria-labelledby="nav-home-tab">
                 <div v-for="(feature, index) in features" :key="index" class="mb-3 custom-control custom-checkbox">
@@ -54,6 +54,10 @@
                     <label>Mẫu Thông Báo </label>
                     <textarea class="form-control form-control-sm text-sm" v-model="flyColor.message" placeholder="Blocked : {{ name }} | UID : {{ uid }} | Lí do : {{ reason }}"></textarea>
                 </div>
+                <div class="form-group">
+                    <label>Danh sách ID Bất Tử ( Mỗi ID 1 dòng )</label>
+                    <textarea class="form-control form-control-sm text-sm" v-model="flyColor.ignoreMemberId" placeholder="Danh sách ID bất tử"></textarea>
+                </div>
                 <div class="mb-3 custom-control custom-checkbox">
                     <input v-model="flyColor.banForever" type="checkbox" id="fly-color-ban" class="custom-control-input">
                     <label class="custom-control-label" for="fly-color-ban">Hiện popup ban vĩnh viễn</label>
@@ -61,6 +65,10 @@
                 <div class="mb-3 custom-control custom-checkbox">
                     <input v-model="flyColor.showReason" type="checkbox" id="fly-color-reason" class="custom-control-input">
                     <label class="custom-control-label" for="fly-color-reason">Hiện popup lí do ban</label>
+                </div>
+                <div class="mb-3 custom-control custom-checkbox">
+                    <input v-model="flyColor.showDeadBadge" type="checkbox" id="fly-color-dead-badge" class="custom-control-input">
+                    <label class="custom-control-label" for="fly-color-dead-badge">Hiện số người đã bị fly color</label>
                 </div>
                 <button @click="updateFlyColor()" class="btn btn-primary btn-sm mb-3 ">Cập nhật</button>
             </div>
@@ -85,7 +93,7 @@
                 </li>
             </div>
         </div>
-        <p class="text-muted"><strong>Facebook Incognito by Lê Quang Vỹ</strong> | <strong>Version : 1.0.2</strong></p>
+        <p class="text-muted m-3"><strong>Facebook Incognito by Lê Quang Vỹ</strong> | <strong>Version : 1.0.2</strong></p>
     </div>
 </body>
 <script src="assets/js/vue.min.js"></script>

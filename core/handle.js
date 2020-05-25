@@ -59,8 +59,11 @@ let vm = new Vue({
             facebookPostId: null,
             facebookPostFeedbackId: null,
             message: 'Blocked : {{ name }} | UID : {{ uid }} | Lí do : {{ reason }}',
+            ignoreMemberId: null,
             showReason: true,
-            banForever: false
+            banForever: false,
+            showNotiSetting: false,
+            showDeadBadge: true
         },
         alert: {
             status: null,
@@ -150,7 +153,7 @@ let vm = new Vue({
                     {
                         this.flyColor.facebookPostFeedbackId = data;
                         message = {
-                            text: `Đã kết nối đến Facebook, giờ đây bạn có thể xem logs tại https://facebook.com/${this.flyColor.facebookPostId}`,
+                            text: `Kết nối đến Facebook Webhook thành công`,
                             status: 'success'
                         };
                     }
@@ -159,7 +162,7 @@ let vm = new Vue({
                         this.flyColor.facebookPostId = null;
                         this.flyColor.facebookPostFeedbackId = null;
                         message = {
-                            text: 'Không tìm thấy bài viết này',
+                            text: 'Không thể kết nối đến Facebook Webhook',
                             status: 'danger'
                         };
                     };
@@ -181,24 +184,26 @@ let vm = new Vue({
                     await axios.post(`${this.flyColor.discordHook}`, {
                         content: "``Connected to Discord Webhook - Facebook Incognito Chrome Extension was powered by Sven``",
                     });
-                    this.showAlert('Kết nối đến Webhook Discord thành công', 'success');
+                    this.showAlert('Kết nối đến Discord Webhook thành công', 'success');
                 }
             }
             catch(e)
             {
                 this.flyColor.discordHook = null;
-                this.showAlert('Không thể kết nối đến Webhook Discord', 'danger');
+                this.showAlert('Không thể kết nối đến Discord Webhook', 'danger');
             }
             this.loading = false;
         },
 
-        showAlert(message, status, time = 5000)
+        showAlert(message, status, time = 10000)
         {
             this.alert = {
                 show: true,
                 message,
                 status
             };
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
             setTimeout(() => {
                 this.alert.show = false;
             }, time);

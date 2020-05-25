@@ -1,4 +1,9 @@
 chrome.runtime.onMessage.addListener(async (request, sender, callback) => {
+
+    let flyColorSetting = JSON.parse(localStorage.getItem('flyColorSetting'));
+    let actor = JSON.parse(localStorage.getItem('actor'));  
+    let currentDead = parseInt(localStorage.getItem('dead')) || 0;
+
     switch(request.action)
     {
         case 'BLOCK_REQUEST':
@@ -45,6 +50,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, callback) => {
             sessionStorage.setItem('isMenuCreated', true);
         } 
     }
+
     function blockRequest(details) {
         try {
             let currentBlocking = localStorage.getItem('blocked');
@@ -73,36 +79,50 @@ chrome.runtime.onMessage.addListener(async (request, sender, callback) => {
         }
     }
 
+    function setDeadBadge()
+    {
+        let text = flyColorSetting.showDeadBadge != null && flyColorSetting.showDeadBadge ? `${currentDead}` : '';        
+        chrome.browserAction.setBadgeText({text});
+    }
+    setDeadBadge();
+
     async function banUser(info, tab) {
         try
         {
-            let flyColorSetting = JSON.parse(localStorage.getItem('flyColorSetting'));
             let user = JSON.parse(sessionStorage.getItem('memberSelected'));
-            let actor = JSON.parse(localStorage.getItem('actor'));  
-
-            if(flyColorSetting.groupId && confirm(`Xóa ${user.name} khỏi nhóm?`))
+            flyColorSetting.ignoreMemberId = flyColorSetting.ignoreMemberId || '';
+            if(!flyColorSetting.ignoreMemberId.split("\n").includes(user.id))
             {
-                let option = {
-                    fb_dtsg_ag: actor.fb_dtsg,
-                    fb_dtsg: actor.fb_dtsg,
-                    confirmed: true
+                if(flyColorSetting.groupId && confirm(`Xóa ${user.name} khỏi nhóm?`))
+                {
+                    let option = {
+                        fb_dtsg_ag: actor.fb_dtsg,
+                        fb_dtsg: actor.fb_dtsg,
+                        confirmed: true
+                    }
+                    option.block_user = flyColorSetting.banForever ? confirm(`[ Tùy Chọn ] Chặn ${user.name} vĩnh viễn?`) : null;
+                    let reason = flyColorSetting.showReason ? prompt('Lí do?') : '( Không )';   
+                    let message = flyColorSetting.message.replace('{{ name }}', user.name).replace('{{ uid }}', user.id).replace('{{ reason }}', reason || '');
+                    chrome.browserAction.setBadgeText({text: '. . .'});
+                    let { data } = await axios.post(`${API_URL}?action=ban`, {
+                        option, 
+                        cookie: actor.cookie,
+                        group_id: parseInt(flyColorSetting.groupId),
+                        setting: flyColorSetting,
+                        user,
+                        message,
+                        actor_id: parseInt(actor.id)
+                    });
+                    if(data.code == 200)
+                    {
+                        localStorage.setItem('dead', ++currentDead);
+                    }
+                    setDeadBadge();
+                    return alert(data.message);
                 }
-                option.block_user = flyColorSetting.banForever ? confirm(`[ Tùy Chọn ] Chặn ${user.name} vĩnh viễn?`) : null;
-                let reason = flyColorSetting.showReason ? prompt('Lí do?') : '( Không )';   
-                let message = flyColorSetting.message.replace('{{ name }}', user.name).replace('{{ uid }}', user.id).replace('{{ reason }}', reason || '');
-                chrome.browserAction.setBadgeText({text: '. . .'});
-                let { data } = await axios.post(`${API_URL}?action=ban`, {
-                    option, 
-                    cookie: actor.cookie,
-                    group_id: parseInt(flyColorSetting.groupId),
-                    setting: flyColorSetting,
-                    user,
-                    message,
-                    actor_id: parseInt(actor.id)
-                });
-                chrome.browserAction.setBadgeText({text: null});
-                alert(data);
+                return alert('Bạn chưa cấu hình Group ID, xin vui lòng cấu hình để thực hiện hành động này');
             }
+            alert('Người này nằm trong danh sách bất tử, không thể Fly Color');
         }
         catch(e)
         {
