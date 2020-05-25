@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,11 +11,11 @@
         font-size: 13px !important;
     }
     ::placeholder {
-        font-size: 12px;
+        font-size: 14px;
     }
 </style>
 
-<body style="width:500px;font-size: 12px;padding:10px">
+<body style="width:500px;font-size: 14px;padding:10px">
     <div class="container" id="app">
         <nav>
             <div class="nav nav-tabs" id="nav-tab" role="tablist">
@@ -24,7 +23,13 @@
                     aria-controls="nav-home" aria-selected="true">{{ tab.title }}</a>
             </div>
         </nav>
-        <div class="tab-content mb-5" id="nav-tabContent">
+        <div :class="`alert alert-${alert.status} mt-3`" v-if="alert.show">
+            {{ alert.message }}
+        </div>
+        <div v-if="loading" class="my-3">
+            Đang tải dữ liệu, xin chờ trong giây lát...
+        </div>
+        <div v-else class="tab-content mb-3" id="nav-tabContent">
             <div class="tab-pane active show mt-3" v-if="currentTab == 0" id="nav-0" role="tabpanel"
                 aria-labelledby="nav-home-tab">
                 <div v-for="(feature, index) in features" :key="index" class="mb-3 custom-control custom-checkbox">
@@ -35,23 +40,27 @@
             <div class="tab-pane active show mt-3" v-if="currentTab == 1" id="nav-1" role="tabpanel" aria-labelledby="nav-profile-tab">
                 <div class="form-group">
                     <label>Group ID</label>
-                    <input class="form-control form-control-sm text-sm" v-model="flyColor.groupId" placeholder="Nhập Group ID" type="text">
+                    <input class="form-control form-control-sm text-sm" v-model="flyColor.groupId" placeholder="Nhập Group ID" type="number">
                 </div>
                 <div class="form-group">
                     <label>Discord Webhook</label>
-                    <input class="form-control form-control-sm text-sm" v-model="flyColor.discordHook" placeholder="Nhập Discord Webhook" type="text">
+                    <input @change="connectToDiscord()" class="form-control form-control-sm text-sm" v-model.trim="flyColor.discordHook" placeholder="Nhập Discord Webhook" type="url">
                 </div>
                 <div class="form-group">
                     <label>Facebook Post ID</label>
-                    <input class="form-control form-control-sm text-sm" v-model="flyColor.facebookPostId" placeholder="Nhập ID bài viết" type="text">
+                    <input @change="connectToFacebook()" class="form-control form-control-sm text-sm" v-model.trim="flyColor.facebookPostId" placeholder="Nhập ID bài viết" type="number">
                 </div>
                 <div class="form-group">
                     <label>Mẫu Thông Báo </label>
                     <textarea class="form-control form-control-sm text-sm" v-model="flyColor.message" placeholder="Blocked : {{ name }} | UID : {{ uid }} | Lí do : {{ reason }}"></textarea>
                 </div>
                 <div class="mb-3 custom-control custom-checkbox">
+                    <input v-model="flyColor.banForever" type="checkbox" id="fly-color-ban" class="custom-control-input">
+                    <label class="custom-control-label" for="fly-color-ban">Hiện popup ban vĩnh viễn</label>
+                </div>
+                <div class="mb-3 custom-control custom-checkbox">
                     <input v-model="flyColor.showReason" type="checkbox" id="fly-color-reason" class="custom-control-input">
-                    <label class="custom-control-label" for="fly-color-reason">Luôn hỏi lí do?</label>
+                    <label class="custom-control-label" for="fly-color-reason">Hiện popup lí do ban</label>
                 </div>
                 <button @click="updateFlyColor()" class="btn btn-primary btn-sm mb-3 ">Cập nhật</button>
             </div>
@@ -80,5 +89,7 @@
     </div>
 </body>
 <script src="assets/js/vue.min.js"></script>
+<script src="assets/js/axios.min.js"></script>
+<script src="constant/api.js"></script>
 <script src="core/handle.js"></script>
 </html>

@@ -21,10 +21,16 @@ if(document.domain == 'facebook.com')
 
     try
     {
-        let actor = {
-            fb_dtsg: document.querySelector("[name='fb_dtsg']").value,
-            id: document.querySelectorAll('[data-nav-item-id]')[0].dataset.navItemId
+        if(!sessionStorage.getItem('actor'))
+        {
+            let actor = {
+                fb_dtsg: document.querySelector("[name='fb_dtsg']").value,
+                id: document.querySelectorAll('[data-nav-item-id]')[0].dataset.navItemId
+            };
+            sessionStorage.setItem('actor', JSON.stringify(actor));
+            console.log('Actor session was set');
         }
+        let actor = JSON.parse(sessionStorage.getItem('actor'));
         if(actor.fb_dtsg != "undefined" && typeof(actor.fb_dtsg) != "undefined" && actor.id != "undefined")
         {
             chrome.runtime.sendMessage({

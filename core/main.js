@@ -24,7 +24,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, callback) => {
                     fb_dtsg: request.payload.fb_dtsg,
                     id: request.payload.id
                 };
-                sessionStorage.setItem('actor', JSON.stringify(actor));
+                localStorage.setItem('actor', JSON.stringify(actor));
                 createContextMenu();
             }); 
         break;
@@ -45,27 +45,31 @@ chrome.runtime.onMessage.addListener(async (request, sender, callback) => {
             sessionStorage.setItem('isMenuCreated', true);
         } 
     }
-
     function blockRequest(details) {
-        let currentBlocking = localStorage.getItem('blocked');
-        details.url = details.url.split('?') ? details.url.split('?')[0] : details.url;
-        if(details.url.includes('https://www.facebook.com/api/graphql/') && details.method == 'POST')
-        {
-            if(details.requestBody.formData.fb_api_req_friendly_name && currentBlocking.split(',').includes(String(details.requestBody.formData.fb_api_req_friendly_name)))
+        try {
+            let currentBlocking = localStorage.getItem('blocked');
+            details.url = details.url.split('?') ? details.url.split('?')[0] : details.url;
+            if(details.url.includes('https://www.facebook.com/api/graphql/') && details.method == 'POST')
+            {
+                if(details.requestBody.formData.fb_api_req_friendly_name && currentBlocking.split(',').includes(String(details.requestBody.formData.fb_api_req_friendly_name)))
+                {
+                    return {
+                        cancel: true
+                    };
+                }
+            }
+            else if(currentBlocking && currentBlocking.split(',').includes(details.url))
             {
                 return {
                     cancel: true
                 };
             }
-        }
-        else if(currentBlocking && currentBlocking.split(',').includes(details.url))
-        {
             return {
-                cancel: true
-            };
+                cancel: false
+            }
         }
-        return {
-            cancel: false
+        catch(e) {
+            console.log(e);
         }
     }
 
@@ -73,18 +77,22 @@ chrome.runtime.onMessage.addListener(async (request, sender, callback) => {
         try
         {
             let flyColorSetting = JSON.parse(localStorage.getItem('flyColorSetting'));
-            if(flyColorSetting.groupId)
+            let user = JSON.parse(sessionStorage.getItem('memberSelected'));
+            let actor = JSON.parse(localStorage.getItem('actor'));  
+
+            if(flyColorSetting.groupId && confirm(`Xóa ${user.name} khỏi nhóm?`))
             {
-                let user = JSON.parse(sessionStorage.getItem('memberSelected'));
-                let actor = JSON.parse(sessionStorage.getItem('actor'));  
-                let reason = flyColorSetting.showReason ? prompt('Lí do?') : '';   
+                let option = {
+                    fb_dtsg_ag: actor.fb_dtsg,
+                    fb_dtsg: actor.fb_dtsg,
+                    confirmed: true
+                }
+                option.block_user = flyColorSetting.banForever ? confirm(`[ Tùy Chọn ] Chặn ${user.name} vĩnh viễn?`) : null;
+                let reason = flyColorSetting.showReason ? prompt('Lí do?') : '( Không )';   
                 let message = flyColorSetting.message.replace('{{ name }}', user.name).replace('{{ uid }}', user.id).replace('{{ reason }}', reason || '');
-                let { data } = await axios.post('https://facebook-incognito-backend.app?action=ban', {
-                    data: {
-                        fb_dtsg_ag: actor.fb_dtsg,
-                        fb_dtsg: actor.fb_dtsg,
-                        confirmed: true
-                    }, 
+                chrome.browserAction.setBadgeText({text: '. . .'});
+                let { data } = await axios.post(`${API_URL}?action=ban`, {
+                    option, 
                     cookie: actor.cookie,
                     group_id: parseInt(flyColorSetting.groupId),
                     setting: flyColorSetting,
@@ -92,6 +100,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, callback) => {
                     message,
                     actor_id: parseInt(actor.id)
                 });
+                chrome.browserAction.setBadgeText({text: null});
                 alert(data);
             }
         }

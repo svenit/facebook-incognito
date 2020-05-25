@@ -1,6 +1,7 @@
 let vm = new Vue({
     el: '#app',
     data: {
+        loading: false,
         currentTab: 0,
         tabs: [
             {
@@ -56,9 +57,16 @@ let vm = new Vue({
             groupId: null,
             discordHook: null,
             facebookPostId: null,
+            facebookPostFeedbackId: null,
             message: 'Blocked : {{ name }} | UID : {{ uid }} | Lí do : {{ reason }}',
-            showReason: true
+            showReason: true,
+            banForever: false
         },
+        alert: {
+            status: null,
+            show: false,
+            message: null
+        }
     },
     methods: {
         setDefaultValue()
@@ -113,12 +121,87 @@ let vm = new Vue({
         updateFlyColor()
         {
             localStorage.setItem('flyColorSetting', JSON.stringify(this.flyColor));
-            alert('Cập nhật thành công');
+            this.showAlert('Cập nhật thành công', 'success');
         },
         setFlyColor()
         {
             let flyColorSetting = localStorage.getItem('flyColorSetting') || this.flyColor;
             this.flyColor = JSON.parse(flyColorSetting);
+        },
+        async connectToFacebook()
+        {
+            let actor = JSON.parse(localStorage.getItem('actor'));              
+            let message;
+            if(actor) 
+            {
+                if(this.flyColor.facebookPostId.trim())
+                {
+                    this.loading = true;
+                    let option = {
+                        fb_dtsg_ag: actor.fb_dtsg,
+                        fb_dtsg: actor.fb_dtsg,
+                    }
+                    let { data } = await axios.post(`${API_URL}?action=get-feedback-id`, {
+                        option, 
+                        cookie: actor.cookie,
+                        setting: this.flyColor
+                    });
+                    if(data) 
+                    {
+                        this.flyColor.facebookPostFeedbackId = data;
+                        message = {
+                            text: `Đã kết nối đến Facebook, giờ đây bạn có thể xem logs tại https://facebook.com/${this.flyColor.facebookPostId}`,
+                            status: 'success'
+                        };
+                    }
+                    else 
+                    {
+                        this.flyColor.facebookPostId = null;
+                        this.flyColor.facebookPostFeedbackId = null;
+                        message = {
+                            text: 'Không tìm thấy bài viết này',
+                            status: 'danger'
+                        };
+                    };
+                    this.loading = false;
+                    this.showAlert(message.text, message.status);
+                    return;
+                }
+                return;
+            }
+            this.showAlert('Phiên đã hết hạn! Vui lòng truy cập vào Facebook để tiếp tục', 'danger');
+        },
+        async connectToDiscord()
+        {
+            this.loading = true;
+            try
+            {
+                if(this.flyColor.discordHook.trim())
+                {
+                    await axios.post(`${this.flyColor.discordHook}`, {
+                        content: "``Connected to Discord Webhook - Facebook Incognito Chrome Extension was powered by Sven``",
+                    });
+                    this.showAlert('Kết nối đến Webhook Discord thành công', 'success');
+                }
+            }
+            catch(e)
+            {
+                this.flyColor.discordHook = null;
+                this.showAlert('Không thể kết nối đến Webhook Discord', 'danger');
+            }
+            this.loading = false;
+        },
+
+        showAlert(message, status, time = 5000)
+        {
+            this.alert = {
+                show: true,
+                message,
+                status
+            };
+            setTimeout(() => {
+                this.alert.show = false;
+            }, time);
         }
     },
 });
