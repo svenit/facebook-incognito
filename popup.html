@@ -11,37 +11,74 @@
     span {
         font-size: 13px !important;
     }
+    ::placeholder {
+        font-size: 12px;
+    }
 </style>
 
-<body style="width:350px;font-size: 12px;padding:5px">
-    <div class="container row" id="app">
-        <div class="col s12">
-            <ul class="tabs">
-                <li v-for="(tab, index) in tabs" :key="index" class="tab col s3"><a>{{ tab.title }}</a></li>
-            </ul>
+<body style="width:500px;font-size: 12px;padding:10px">
+    <div class="container" id="app">
+        <nav>
+            <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                <a v-for="(tab, index) in tabs" @click="currentTab = index" :class="`nav-item nav-link ${currentTab == index ? 'active' : ''}`" id="nav-home-tab" data-toggle="tab" :href="`#nav-${index}`" role="tab"
+                    aria-controls="nav-home" aria-selected="true">{{ tab.title }}</a>
+            </div>
+        </nav>
+        <div class="tab-content mb-5" id="nav-tabContent">
+            <div class="tab-pane active show mt-3" v-if="currentTab == 0" id="nav-0" role="tabpanel"
+                aria-labelledby="nav-home-tab">
+                <div v-for="(feature, index) in features" :key="index" class="mb-3 custom-control custom-checkbox">
+                    <input v-model="feature.status" @change="handleStatus(feature)" type="checkbox" class="custom-control-input" :id="index">
+                    <label class="custom-control-label" :for="index">{{ feature.text }}</label>
+                </div>
+            </div>
+            <div class="tab-pane active show mt-3" v-if="currentTab == 1" id="nav-1" role="tabpanel" aria-labelledby="nav-profile-tab">
+                <div class="form-group">
+                    <label>Group ID</label>
+                    <input class="form-control form-control-sm text-sm" v-model="flyColor.groupId" placeholder="Nhập Group ID" type="text">
+                </div>
+                <div class="form-group">
+                    <label>Discord Webhook</label>
+                    <input class="form-control form-control-sm text-sm" v-model="flyColor.discordHook" placeholder="Nhập Discord Webhook" type="text">
+                </div>
+                <div class="form-group">
+                    <label>Facebook Post ID</label>
+                    <input class="form-control form-control-sm text-sm" v-model="flyColor.facebookPostId" placeholder="Nhập ID bài viết" type="text">
+                </div>
+                <div class="form-group">
+                    <label>Mẫu Thông Báo </label>
+                    <textarea class="form-control form-control-sm text-sm" v-model="flyColor.message" placeholder="Blocked : {{ name }} | UID : {{ uid }} | Lí do : {{ reason }}"></textarea>
+                </div>
+                <div class="mb-3 custom-control custom-checkbox">
+                    <input v-model="flyColor.showReason" type="checkbox" id="fly-color-reason" class="custom-control-input">
+                    <label class="custom-control-label" for="fly-color-reason">Luôn hỏi lí do?</label>
+                </div>
+                <button @click="updateFlyColor()" class="btn btn-primary btn-sm mb-3 ">Cập nhật</button>
+            </div>
+            <div class="tab-pane active show mt-3" v-if="currentTab == 2" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
+                <p><strong>Giới Thiệu</strong></p>
+                <p>Facebook Incognito là một dự án open source của mình, các bạn có để đóng góp ý kiến hoặc có ý tưởng thêm tính năng mới thì vào <a href="#">https://github.com/svenit/facebook-incognito/issues/new</a></p>
+                <p>Nghiêm cấm sử dụng mã nguồn của mình cho việc thương mại hóa</p>
+                <p>Nếu bạn là một người lịch sự xin vui lòng không xóa watermark ^^</p>
+                <p>Mã nguồn sẽ luôn được cập nhật tại đây : <a href="#">https://github.com/svenit/facebook-incognito</a></p>
+                <p><strong>Liên Hệ</strong></p>
+                <li class="mb-1">
+                    Facebook : <a href="https://www.facebook.com/sven307">https://www.facebook.com/sven307</a>
+                </li>
+                <li class="mb-1">
+                    Gmail : <a href="https://www.facebook.com/sven307">lequangvy2k@gmail.com</a>
+                </li class="mb-1">
+                <li class="mb-1">
+                    Blog : <a href="https://www.facebook.com/sven307">https://svenit.github.io/</a>
+                </li>
+                <li class="mb-1">
+                    Github : <a href="https://www.facebook.com/sven307">https://github.com/svenit</a>
+                </li>
+            </div>
         </div>
-        <div v-if="tab == 'feature'" class="col s12">
-            <p v-for="(feature, index) in features" :key="index">
-                <label>
-                    <input v-model="feature.status" @change="handleStatus(feature)" type="checkbox" class=""
-                        checked="checked" />
-                    <span>{{ feature.text }}</span>
-                </label>
-            </p>
-        </div>
+        <p class="text-muted"><strong>Facebook Incognito by Lê Quang Vỹ</strong> | <strong>Version : 1.0.2</strong></p>
     </div>
-    <!-- <div class="container" id="app">
-        <p v-for="(feature, index) in features" :key="index">
-            <label>
-                <input v-model="feature.status" @change="handleStatus(feature)" type="checkbox" class=""
-                    checked="checked" />
-                <span>{{ feature.text }}</span>
-            </label>
-        </p>
-        <p style="margin-top:20px;color: #ccc"><span>Developed by Sven</span></p>
-    </div> -->
 </body>
 <script src="assets/js/vue.min.js"></script>
 <script src="core/handle.js"></script>
-
 </html>

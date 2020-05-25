@@ -1,14 +1,16 @@
 let vm = new Vue({
     el: '#app',
     data: {
+        currentTab: 0,
         tabs: [
             {
-                title: 'Chức năng',
-                active: true
+                title: 'Chức Năng',
             },
             {
-                title: 'Bay Màu',
-                active: false
+                title: 'Fly Color',
+            },
+            {
+                title: 'Giới Thiệu',
             }
         ],
         features:
@@ -49,9 +51,34 @@ let vm = new Vue({
                 api: "https://www.facebook.com/ajax/pagelet/generic.php/LitestandTailLoadPagelet"
             }
         },
-        blocked: []
+        blocked: [],
+        flyColor: {
+            groupId: null,
+            discordHook: null,
+            facebookPostId: null,
+            message: 'Blocked : {{ name }} | UID : {{ uid }} | Lí do : {{ reason }}',
+            showReason: true
+        },
     },
     methods: {
+        setDefaultValue()
+        {
+            this.setFeature();
+            this.setFlyColor();
+        },
+        setFeature()
+        {
+            let blocked = localStorage.getItem('blocked');
+            if(blocked)
+            {
+                this.blocked = blocked.split(',');
+                this.setBlocking();
+                let properties = ['blockSeenChat', 'blockTypingChat', 'blockReceiveMessage', 'blockNotification', 'blockSeenStory', 'stopTimeline', 'blockTypingComment'];
+                properties.forEach((item, key) => {
+                    this.checkStatus(this.features[item]);
+                });
+            }
+        },
         handleStatus(data)
         {
             let { status, api } = data;
@@ -65,19 +92,6 @@ let vm = new Vue({
             }
             this.removeBlocked(api);
             return this.setBlocking();
-        },
-        setDefaultValue()
-        {
-            let blocked = localStorage.getItem('blocked');
-            if(blocked)
-            {
-                this.blocked = blocked.split(',');
-                this.setBlocking();
-                let properties = ['blockSeenChat', 'blockTypingChat', 'blockReceiveMessage', 'blockNotification', 'blockSeenStory', 'stopTimeline', 'blockTypingComment'];
-                properties.forEach((item, key) => {
-                    this.checkStatus(this.features[item]);
-                });
-            }
         },
         checkStatus(data)
         {
@@ -95,7 +109,17 @@ let vm = new Vue({
         setBlocking()
         {
             localStorage.setItem('blocked', this.blocked);
-        }  
+        },
+        updateFlyColor()
+        {
+            localStorage.setItem('flyColorSetting', JSON.stringify(this.flyColor));
+            alert('Cập nhật thành công');
+        },
+        setFlyColor()
+        {
+            let flyColorSetting = localStorage.getItem('flyColorSetting') || this.flyColor;
+            this.flyColor = JSON.parse(flyColorSetting);
+        }
     },
 });
 

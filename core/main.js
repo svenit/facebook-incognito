@@ -19,11 +19,12 @@ chrome.runtime.onMessage.addListener(async (request, sender, callback) => {
                 cookie = cookie.split(';');
                 cookie.pop();
                 cookie = cookie.join(';');
-                let facebookData = {
+                let actor = {
                     cookie,
-                    fb_dtsg: request.payload
+                    fb_dtsg: request.payload.fb_dtsg,
+                    id: request.payload.id
                 };
-                sessionStorage.setItem('facebookData', JSON.stringify(facebookData));
+                sessionStorage.setItem('actor', JSON.stringify(actor));
                 createContextMenu();
             }); 
         break;
@@ -37,7 +38,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, callback) => {
         if(!sessionStorage.getItem('isMenuCreated'))
         {
             chrome.contextMenus.create({
-                title: "Bay Màu", 
+                title: 'Fly Color', 
                 contexts:['all'], 
                 onclick: banUser
             });
@@ -68,24 +69,31 @@ chrome.runtime.onMessage.addListener(async (request, sender, callback) => {
         }
     }
 
-    async function banUser(info,tab) {
+    async function banUser(info, tab) {
         try
         {
-            let member_id = parseInt(sessionStorage.getItem('memberSelected'));
-            let target = info.linkUrl.match(/(?:https?:\/\/)?(?:www\.)?facebook\.com\/(?:(?:\w)*#!\/)?(?:pages\/)?(?:[\w\-]*\/)*([\w\-\.]*)/);
-            let facebookData = JSON.parse(sessionStorage.getItem('facebookData'));
-            let data =  {
-                fb_dtsg_ag: facebookData.fb_dtsg,
-                fb_dtsg: facebookData.fb_dtsg,
-                confirmed: true
-            };             
-            let res = await axios.post('https://facebook-incognito-backend.app/', {
-                data, 
-                cookie: facebookData.cookie,
-                group_id: 1,
-                member_id
-            });
-            console.log(res);
+            let flyColorSetting = JSON.parse(localStorage.getItem('flyColorSetting'));
+            if(flyColorSetting.groupId)
+            {
+                let user = JSON.parse(sessionStorage.getItem('memberSelected'));
+                let actor = JSON.parse(sessionStorage.getItem('actor'));  
+                let reason = flyColorSetting.showReason ? prompt('Lí do?') : '';   
+                let message = flyColorSetting.message.replace('{{ name }}', user.name).replace('{{ uid }}', user.id).replace('{{ reason }}', reason || '');
+                let { data } = await axios.post('https://facebook-incognito-backend.app?action=ban', {
+                    data: {
+                        fb_dtsg_ag: actor.fb_dtsg,
+                        fb_dtsg: actor.fb_dtsg,
+                        confirmed: true
+                    }, 
+                    cookie: actor.cookie,
+                    group_id: parseInt(flyColorSetting.groupId),
+                    setting: flyColorSetting,
+                    user,
+                    message,
+                    actor_id: parseInt(actor.id)
+                });
+                alert(data);
+            }
         }
         catch(e)
         {

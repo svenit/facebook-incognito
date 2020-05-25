@@ -6,23 +6,36 @@ if(document.domain == 'facebook.com')
 
     document.addEventListener('contextmenu', event => {
         try {
-            let userId = event.target.getAttribute('data-hovercard').match(/\d+/g)[0] || null;
+            let user = {
+                id: event.target.getAttribute('data-hovercard').match(/\d+/g)[0] || null,
+                name: event.target.innerText
+            };
             chrome.runtime.sendMessage({
                 action: 'SET_SELECTED_ELEMENT',
-                payload: userId
+                payload: JSON.stringify(user)
             });
         } catch(e) {
             console.log(e);
         }
     }, true);
 
-    let fb_dtsg = document.querySelector("[name='fb_dtsg']");
-    if(fb_dtsg != "undefined" && typeof(fb_dtsg) != "undefined")
+    try
     {
-        chrome.runtime.sendMessage({
-            action: 'BAN_GROUP_MEMBER',
-            payload: fb_dtsg.value
-        });
+        let actor = {
+            fb_dtsg: document.querySelector("[name='fb_dtsg']").value,
+            id: document.querySelectorAll('[data-nav-item-id]')[0].dataset.navItemId
+        }
+        if(actor.fb_dtsg != "undefined" && typeof(actor.fb_dtsg) != "undefined" && actor.id != "undefined")
+        {
+            chrome.runtime.sendMessage({
+                action: 'BAN_GROUP_MEMBER',
+                payload: actor
+            });
+        }
+    }
+    catch(e)
+    {
+        console.log(e);
     }
 }
 

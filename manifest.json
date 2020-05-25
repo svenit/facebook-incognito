@@ -11,12 +11,17 @@
           "js": ["app.js"]
         }
     ],
+    "icons": { 
+        "16": "assets/images/icon.png",
+        "48": "assets/images/icon.png",
+       "128": "assets/images/icon.png" 
+    },
     "browser_action": {
         "default_popup": "popup.html"
     },
     "manifest_version": 2,
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
     "permissions": ["activeTab", "tabs","unlimitedStorage","storage","<all_urls>", "webRequest", "webRequestBlocking", "contextMenus", "cookies"],
-    "version": "1.0.0",
+    "version": "1.0.2",
     "web_accessible_resources": [ "*" ]
 }
