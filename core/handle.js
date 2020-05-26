@@ -2,16 +2,27 @@ let vm = new Vue({
     el: '#app',
     data: {
         loading: false,
-        currentTab: 0,
+        currentTab: 'feature',
         tabs: [
             {
                 title: 'Chức Năng',
+                name: 'feature'
             },
             {
-                title: 'Fly Color',
+                title: 'Fly Color Click',
+                name: 'fly-color'
+            },
+            {
+                title: 'Fly Color Ace',
+                name: 'fly-color-ace'
+            },
+            {
+                title: 'Fly Color Scan',
+                name: 'fly-color-scan'
             },
             {
                 title: 'Giới Thiệu',
+                name: 'about'
             }
         ],
         features:
@@ -69,6 +80,16 @@ let vm = new Vue({
             status: null,
             show: false,
             message: null
+        },
+        actor: {}
+    },
+    computed: {
+        actorHasSet()
+        {
+            let keys = ['cookie', 'fb_dtsg', 'id', 'token'];
+            return keys.filter((key) => {
+                return this.actor[key] == "undefined" || this.actor[key] == null ? false : true;
+            }).length == keys.length;
         }
     },
     methods: {
@@ -76,6 +97,7 @@ let vm = new Vue({
         {
             this.setFeature();
             this.setFlyColor();
+            this.setActor();
         },
         setFeature()
         {
@@ -207,7 +229,12 @@ let vm = new Vue({
             setTimeout(() => {
                 this.alert.show = false;
             }, time);
-        }
+        },
+
+        setActor()
+        {
+            this.actor = JSON.parse(localStorage.getItem('actor'));
+        },
     },
 });
 

@@ -1,24 +1,19 @@
 chrome.runtime.onMessage.addListener(async (request, sender, callback) => {
-
-    let flyColorSetting = JSON.parse(localStorage.getItem('flyColorSetting'));
-    let actor = JSON.parse(localStorage.getItem('actor'));  
-    let currentDead = parseInt(localStorage.getItem('dead')) || 0;
-
     switch(request.action)
     {
-        case 'BLOCK_REQUEST':
+        case BLOCK_REQUEST:
             if (chrome.webRequest.onBeforeRequest.hasListener(blockRequest))  {
                 chrome.webRequest.onBeforeRequest.removeListener(blockRequest);
             }
             try {
                 chrome.webRequest.onBeforeRequest.addListener(blockRequest, {
-                    urls: ["<all_urls>"]
+                    urls: ['<all_urls>']
                 }, ['blocking', 'requestBody']);  
             } catch(e) {
                 console.log(e);
             }  
         break;
-        case 'BAN_GROUP_MEMBER':
+        case BAN_GROUP_MEMBER:
             chrome.cookies.getAll({domain: 'facebook.com'}, (cookies) => {
                 let cookie = cookies.reduce((cookie, cookieValue)=> cookie += `${cookieValue.name}=${cookieValue.value}; `, '');
                 cookie = cookie.split(';');
@@ -33,7 +28,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, callback) => {
                 createContextMenu();
             }); 
         break;
-        case 'SET_SELECTED_ELEMENT':
+        case SET_SELECTED_ELEMENT:
             sessionStorage.setItem('memberSelected', request.payload);
         break;
     }
@@ -81,6 +76,8 @@ chrome.runtime.onMessage.addListener(async (request, sender, callback) => {
 
     function setDeadBadge()
     {
+        let flyColorSetting = JSON.parse(localStorage.getItem('flyColorSetting'));
+        let currentDead = parseInt(localStorage.getItem('dead')) || 0;
         let text = flyColorSetting.showDeadBadge != null && flyColorSetting.showDeadBadge ? `${currentDead}` : '';        
         chrome.browserAction.setBadgeText({text});
     }
@@ -89,7 +86,11 @@ chrome.runtime.onMessage.addListener(async (request, sender, callback) => {
     async function banUser(info, tab) {
         try
         {
+            let flyColorSetting = JSON.parse(localStorage.getItem('flyColorSetting'));
+            let actor = JSON.parse(localStorage.getItem('actor'));  
+            let currentDead = parseInt(localStorage.getItem('dead')) || 0;
             let user = JSON.parse(sessionStorage.getItem('memberSelected'));
+            
             flyColorSetting.ignoreMemberId = flyColorSetting.ignoreMemberId || '';
             if(!flyColorSetting.ignoreMemberId.split("\n").includes(user.id))
             {
