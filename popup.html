@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Lê Quang Vỹ | Facebook Incognito</title>
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <style>
@@ -39,7 +39,16 @@
             </div>
             <div class="tab-pane active show mt-3" v-if="currentTab == 'fly-color'" id="nav-1" role="tabpanel" aria-labelledby="nav-profile-tab">
                 <div v-if="actorHasSet">
-                    <div class="form-group">
+                    <div class="alert alert-warning">
+                        <div class="custom-control custom-checkbox">
+                            <input v-model="flyColor.multipleGroups" type="checkbox" id="fly-color-multipleGroups" class="custom-control-input">
+                            <label class="custom-control-label" for="fly-color-multipleGroups"><strong>Fly Color Click In Multiple Groups</strong></label>
+                        </div>
+                        <div class="mt-2" v-if="!flyColor.multipleGroups">
+                            <div><strong>Fly Color Click In Multiple Groups</strong> là chức năng thử nghiệm nên sẽ có vài bug nhỏ, khi bạn bật chức năng này, bạn có thể sử dụng <strong>Fly Color Click</strong> trên tất cả các nhóm mà bạn làm Admin. Bạn nên cân nhắc sử dụng thông báo đa kênh Discord, Facebook khi sử dụng tính năng này</div>
+                        </div>
+                    </div>
+                    <div v-if="!flyColor.multipleGroups" class="form-group">
                         <label>Group ID</label>
                         <input class="form-control form-control-sm text-sm" v-model="flyColor.groupId" placeholder="Nhập Group ID" type="number">
                     </div>
@@ -74,7 +83,7 @@
                     <button @click="updateFlyColor()" class="btn btn-primary btn-sm mb-3 ">Cập nhật</button>
                  </div>
                  <div v-else>
-                     Vui lòng truy cập Facebook để thực hiện hành động này
+                     Xin vui lòng truy cập Facebook để sử dụng chức năng này 😉
                  </div>
             </div>
             <div class="tab-pane active show mt-3" v-if="currentTab == 'about'" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
@@ -103,6 +112,6 @@
 </body>
 <script src="assets/js/vue.min.js"></script>
 <script src="assets/js/axios.min.js"></script>
-<script src="constant/api.js"></script>
+<script src="constant/define.js"></script>
 <script src="core/handle.js"></script>
 </html>

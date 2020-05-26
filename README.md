@@ -8,7 +8,7 @@
 - Dễ dàng quản lý nhóm của bạn với chức năng **Fly Color**, chỉ bằng 1 click là bạn có thể kick thành viên đó ra khỏi nhóm
 - Lọc mem hàng loạt theo UID ( Đang cập nhật )
 - Lọc mem hàng loạt theo từ cấm ( Đang cập nhật )
-- Log thông báo đa kênh như Discord, Slack... ( Đang cập nhật )
+- Log thông báo đa kênh như Discord, Facebook...
 
 ### Installation
 

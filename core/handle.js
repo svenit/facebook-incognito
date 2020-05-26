@@ -65,6 +65,7 @@ let vm = new Vue({
         },
         blocked: [],
         flyColor: {
+            multipleGroups: false,
             groupId: null,
             discordHook: null,
             facebookPostId: null,
@@ -81,14 +82,19 @@ let vm = new Vue({
             show: false,
             message: null
         },
-        actor: {}
+        actor: {
+            cookie: null,
+            fb_dtsg: null,
+            id: null,
+            token: null
+        }
     },
     computed: {
         actorHasSet()
         {
             let keys = ['cookie', 'fb_dtsg', 'id', 'token'];
             return keys.filter((key) => {
-                return this.actor[key] == "undefined" || this.actor[key] == null ? false : true;
+                return this.actor[key] != null;
             }).length == keys.length;
         }
     },
@@ -150,8 +156,7 @@ let vm = new Vue({
         },
         setFlyColor()
         {
-            let flyColorSetting = localStorage.getItem('flyColorSetting') || this.flyColor;
-            this.flyColor = JSON.parse(flyColorSetting);
+            this.flyColor = JSON.parse(localStorage.getItem('flyColorSetting')) || this.flyColor;
         },
         async connectToFacebook()
         {
@@ -175,7 +180,7 @@ let vm = new Vue({
                     {
                         this.flyColor.facebookPostFeedbackId = data;
                         message = {
-                            text: `Kết nối đến Facebook Webhook thành công`,
+                            text: `Kết nối đến Facebook thành công`,
                             status: 'success'
                         };
                     }
@@ -184,7 +189,7 @@ let vm = new Vue({
                         this.flyColor.facebookPostId = null;
                         this.flyColor.facebookPostFeedbackId = null;
                         message = {
-                            text: 'Không thể kết nối đến Facebook Webhook',
+                            text: 'Không thể kết nối đến Facebook',
                             status: 'danger'
                         };
                     };
@@ -233,7 +238,7 @@ let vm = new Vue({
 
         setActor()
         {
-            this.actor = JSON.parse(localStorage.getItem('actor'));
+            this.actor = JSON.parse(localStorage.getItem('actor')) || this.actor;
         },
     },
 });
