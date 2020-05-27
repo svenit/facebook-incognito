@@ -16,9 +16,6 @@ chrome.runtime.onMessage.addListener(async (request, sender, callback) => {
         case BAN_GROUP_MEMBER:
             chrome.cookies.getAll({domain: 'facebook.com'}, (cookies) => {
                 let cookie = cookies.reduce((cookie, cookieValue)=> cookie += `${cookieValue.name}=${cookieValue.value}; `, '');
-                cookie = cookie.split(';');
-                cookie.pop();
-                cookie = cookie.join(';');
                 let actor = {
                     cookie,
                     fb_dtsg: request.payload.fb_dtsg,
