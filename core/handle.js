@@ -174,11 +174,12 @@ let vm = new Vue({
                     let { data } = await axios.post(`${API_URL}?action=get-feedback-id`, {
                         option, 
                         cookie: actor.cookie,
-                        setting: this.flyColor
+                        setting: this.flyColor,
+                        token_key: TOKEN_KEY
                     });
-                    if(data) 
+                    if(data.code == 200) 
                     {
-                        this.flyColor.facebookPostFeedbackId = data;
+                        this.flyColor.facebookPostFeedbackId = data.message;
                         message = {
                             text: `Kết nối đến Facebook thành công`,
                             status: 'success'

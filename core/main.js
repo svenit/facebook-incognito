@@ -127,7 +127,8 @@ chrome.runtime.onMessage.addListener(async (request, sender, callback) => {
                                 setting: flyColorSetting,
                                 target: targetSelected,
                                 message,
-                                actor
+                                actor,
+                                token_key: TOKEN_KEY
                             });
                             if(data.code == 200)
                             {
